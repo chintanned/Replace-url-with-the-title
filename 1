@@ -1,0 +1,38 @@
+function replaceUrlsWithClickableLinks() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getActiveRange();
+  var data = range.getValues();
+  
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].length; j++) {
+      var cellValue = data[i][j];
+      var urlPattern = /(https?:\/\/\S+)/g;
+      var urls = cellValue.match(urlPattern);
+      
+      if (urls) {
+        for (var k = 0; k < urls.length; k++) {
+          var url = urls[k];
+          var linkName = getLinkName(url);
+          var link = '=HYPERLINK("' + url + '", "' + linkName + '")';
+          cellValue = cellValue.replace(url, link);
+        }
+        
+        data[i][j] = cellValue;
+      }
+    }
+  }
+  
+  range.setValues(data);
+}
+
+function getLinkName(url) {
+  var linkName = url;
+  
+  // Extract the link name from the URL
+  var urlParts = url.split('/');
+  if (urlParts.length > 3) {
+    linkName = urlParts[urlParts.length - 1];
+  }
+  
+  return linkName;
+}
